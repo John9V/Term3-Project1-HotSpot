@@ -1,4 +1,4 @@
-package com.example.hotspot.ui.dashboard;
+package com.example.hotspot.ui.statistics;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.hotspot.R;
 
-public class DashboardFragment extends Fragment {
+public class StatisticsFragment extends Fragment {
 
-    private DashboardViewModel dashboardViewModel;
+    private StatisticsViewModel statisticsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        dashboardViewModel =
-                ViewModelProviders.of(this).get(DashboardViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_dashboard, container, false);
-        final TextView textView = root.findViewById(R.id.text_dashboard);
-        dashboardViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        statisticsViewModel =
+                ViewModelProviders.of(this).get(StatisticsViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_statistics, container, false);
+        final TextView textView = root.findViewById(R.id.text_statistics);
+        statisticsViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);
