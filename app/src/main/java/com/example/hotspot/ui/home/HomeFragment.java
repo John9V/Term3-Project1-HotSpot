@@ -3,6 +3,7 @@ package com.example.hotspot.ui.home;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +19,6 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.hotspot.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,18 +28,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
+    private int highestIndex = 0;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 10;
     private HomeViewModel homeViewModel;
@@ -49,6 +50,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Location lastKnownLocation;
     private LatLng defaultLocation;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private DatabaseReference mostRecentPlace = database.getReference("mostRecentPlace");
+    private DatabaseReference places = database.getReference("places");
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
@@ -66,12 +69,12 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         mapView.getMapAsync(this);
         getLocationPermission();
         getDeviceLocation();
+        periodicallyStoreLocation();
 
 //        // Write a message to the database
 
         DatabaseReference myRef = database.getReference("message");
         myRef.setValue("Hello, World!");
-//        System.out.println("LAST LOCATION: " + lastKnownLocation);
 
 
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
@@ -152,27 +155,16 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
          */
-        System.out.println("Running");
         try {
-            System.out.println("still running");
             if (locationPermissionGranted) {
-                System.out.println("still runninng");
-                Task<Location> locationResult = fusedLocationClient.getLastLocation();
-                locationResult.addOnCompleteListener(new OnCompleteListener<Location>() {
+                final Task<Location>[] locationResult = new Task[]{fusedLocationClient.getLastLocation()};
+                locationResult[0].addOnCompleteListener(new OnCompleteListener<Location>() {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
-                        System.out.println("still running in oncomplete");
                         if (task.isSuccessful()) {
-                            // Set the map's camera position to the current location of the device.
-                            lastKnownLocation = task.getResult();
-                            if (lastKnownLocation != null) {
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(lastKnownLocation.getLatitude(),
-                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
-                                DatabaseReference places = database.getReference("place");
-                                places.setValue(lastKnownLocation.toString());
-                                System.out.println("PLACE: " + lastKnownLocation);
-                            }
+                                lastKnownLocation = task.getResult();
+                                moveCameraTo(lastKnownLocation);
+                                storeRecentPlace();
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -180,6 +172,75 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                     .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                             googleMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
+
+                    }
+                });
+            }
+        } catch (SecurityException e)  {
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
+
+    }
+
+    CountDownTimer countDownTimer;
+    public void periodicallyStoreLocation() {
+        countDownTimer = new CountDownTimer(Long.MAX_VALUE, 10000) {
+
+            // This is called after every given interval.
+            public void onTick(long millisUntilFinished) {
+                storeRecentPlace();
+            }
+
+            public void onFinish() {
+                start();
+            }
+        }.start();
+    }
+
+    public void moveCameraTo(Location location) {
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(location.getLatitude(),
+                        location.getLongitude()), DEFAULT_ZOOM));
+    }
+
+    public void storeRecentPlace() {
+        try {
+            if (locationPermissionGranted) {
+                final Task<Location>[] locationResult = new Task[]{fusedLocationClient.getLastLocation()};
+                locationResult[0].addOnCompleteListener(new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if (task.isSuccessful()) {
+                            // sets the most recent place
+                            mostRecentPlace.setValue(lastKnownLocation);
+
+                            // adds the most recent place to all places stored
+                            DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
+                            DatabaseReference placesRef = rootRef.child("places");
+                            ValueEventListener eventListener = new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                                    // finds the last index of a stored location
+                                    for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                                        highestIndex = Integer.parseInt(ds.getKey());
+                                    }
+                                    // adds a a location
+                                    places.child(String.valueOf(highestIndex+1)).setValue(lastKnownLocation);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {}
+                            };
+                            placesRef.addListenerForSingleValueEvent(eventListener);
+                        } else {
+                            Log.d(TAG, "Current location is null. Using defaults.");
+                            Log.e(TAG, "Exception: %s", task.getException());
+                            googleMap.moveCamera(CameraUpdateFactory
+                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                            googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                        }
+
                     }
                 });
             }
@@ -187,6 +248,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
+
 
 
 
