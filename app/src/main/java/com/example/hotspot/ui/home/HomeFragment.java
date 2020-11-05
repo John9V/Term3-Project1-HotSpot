@@ -184,7 +184,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
     CountDownTimer countDownTimer;
     public void periodicallyStoreLocation() {
-        countDownTimer = new CountDownTimer(Long.MAX_VALUE, 10000) {
+        countDownTimer = new CountDownTimer(Long.MAX_VALUE, 1000 * 60 * 60 ) {
 
             // This is called after every given interval.
             public void onTick(long millisUntilFinished) {
