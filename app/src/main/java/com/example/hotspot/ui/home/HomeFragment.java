@@ -151,6 +151,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void getDeviceLocation() {
+        /*
+         * Get the best and most recent location of the device, which may be null in rare
+         * cases when a location is not available.
+         */
         try {
             if (locationPermissionGranted) {
                 final Task<Location>[] locationResult = new Task[]{fusedLocationClient.getLastLocation()};
@@ -245,10 +249,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    /*
-     * Get the best and most recent location of the device, which may be null in rare
-     * cases when a location is not available.
-     */
+
 
 
 
