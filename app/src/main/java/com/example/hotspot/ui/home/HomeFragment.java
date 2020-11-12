@@ -28,19 +28,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
-    private int highestIndex = 0;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 10;
     private HomeViewModel homeViewModel;
@@ -50,8 +50,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Location lastKnownLocation;
     private LatLng defaultLocation;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private DatabaseReference mostRecentPlace = database.getReference("mostRecentPlace");
-    private DatabaseReference places = database.getReference("places");
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private String userID = user.getUid();
+    private DatabaseReference mostRecentPlace = database.getReference(userID).child("mostRecentPlace");
+    private DatabaseReference places = database.getReference(userID).child("places");
 //    @Override
 //    public void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);
@@ -68,8 +70,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         mapView.onResume();
         mapView.getMapAsync(this);
         getLocationPermission();
-        getDeviceLocation();
-        periodicallyStoreLocation();
+        periodicallyStoreLocation(); // causes a duplicate store of the location
 
 //        // Write a message to the database
 
@@ -188,7 +189,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
             // This is called after every given interval.
             public void onTick(long millisUntilFinished) {
-                storeRecentPlace();
+                getDeviceLocation();
             }
 
             public void onFinish() {
@@ -216,17 +217,13 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
 
                             // adds the most recent place to all places stored
                             DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-                            DatabaseReference placesRef = rootRef.child("places");
+                            final DatabaseReference placesRef = rootRef.child("places");
                             ValueEventListener eventListener = new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-
-                                    // finds the last index of a stored location
-                                    for(DataSnapshot ds : dataSnapshot.getChildren()) {
-                                        highestIndex = Integer.parseInt(ds.getKey());
-                                    }
-                                    // adds a a location
-                                    places.child(String.valueOf(highestIndex+1)).setValue(lastKnownLocation);
+                                    // adds a location to the recent locations
+                                    String id = places.push().getKey();
+                                    places.child(id).setValue(lastKnownLocation);
                                 }
 
                                 @Override
