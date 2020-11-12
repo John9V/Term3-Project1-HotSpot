@@ -21,7 +21,7 @@
             android:label="@string/title_activity_main" />
 
         <activity
-            android:name=".ViewDatabase">
+            android:name=".ui.settings.ViewDatabase">
         </activity>
 
         <activity
