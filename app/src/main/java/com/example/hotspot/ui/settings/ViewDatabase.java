@@ -70,7 +70,8 @@ public class ViewDatabase extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again whenever data at this location is updated.
-//                showData(dataSnapshot);
+                // showData is breaking the app
+                showData(dataSnapshot);
             }
 
             @Override
@@ -79,33 +80,34 @@ public class ViewDatabase extends AppCompatActivity {
         });
     } // onCreate ending
 
-//    private void showData(DataSnapshot dataSnapshot) {
-//        for(DataSnapshot ds : dataSnapshot.getChildren()){
-//            UserInformation uInfo = new UserInformation();
-////            uInfo.setName(ds.child(userID).getValue(UserInformation.class).getName()); //set the name
-////            uInfo.setEmail(ds.child(userID).getValue(UserInformation.class).getEmail()); //set the email
-////            uInfo.setPhone_num(ds.child(userID).getValue(UserInformation.class).getPhone_num()); //set the phone_num
-//
-//            uInfo.setComplete(ds.child(userID).getValue(UserInformation.class).isComplete()); // set status of complete
-//
+    // this method is breaking the app
+    private void showData(DataSnapshot dataSnapshot) {
+        for(DataSnapshot ds : dataSnapshot.getChildren()){
+            UserInformation uInfo = new UserInformation();
+//            uInfo.setName(ds.child(userID).getValue(UserInformation.class).getName()); //set the name
+//            uInfo.setEmail(ds.child(userID).getValue(UserInformation.class).getEmail()); //set the email
+//            uInfo.setPhone_num(ds.child(userID).getValue(UserInformation.class).getPhone_num()); //set the phone_num
+
+//            this is breaking the app
+//            uInfo.setAccuracy(ds.child(userID).getValue(UserInformation.class).getAccuracy());
+//            uInfo.setComplete(ds.child(userID).getValue(UserInformation.class).isComplete());
+
 //            //display all the information
 ////            Log.d(TAG, "showData: name: " + uInfo.getName());
-////            Log.d(TAG, "showData: email: " + uInfo.getEmail());
-////            Log.d(TAG, "showData: phone_num: " + uInfo.getPhone_num());
+            Log.d(TAG, "showData: Complete: " + uInfo.getAccuracy());
+            Log.d(TAG, "showData: Complete: " + uInfo.isComplete());
 //
-//            Log.d(TAG, "showData: Complete: " + uInfo.isComplete());
-//
-//            ArrayList<Object> array  = new ArrayList<>();
-////            array.add(uInfo.getName());
-////            array.add(uInfo.getEmail());
-////            array.add(uInfo.getPhone_num());
-//
-//            array.add(uInfo.isComplete());
-//
-//            ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,array);
-//            mListView.setAdapter(adapter);
-//        }
-//    } // showData ending
+            ArrayList<Object> array  = new ArrayList<>();
+//            array.add(uInfo.getName());
+//            array.add(uInfo.getEmail());
+//            array.add(uInfo.getPhone_num());
+            array.add(uInfo.getAccuracy());
+            array.add(uInfo.isComplete());
+
+            ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,array);
+            mListView.setAdapter(adapter);
+        }
+    } // showData ending
 
     @Override
     public void onStart() {
