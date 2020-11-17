@@ -3,17 +3,17 @@ package com.example.hotspot.ui.settings;
 import java.math.BigDecimal;
 
 public class UserInformation {
-    private int accuracy;
+    private long accuracy;
     private boolean complete;
 
     public UserInformation(){
     }
 
-    public int getAccuracy() {
+    public long getAccuracy() {
         return accuracy;
     }
 
-    public void setAccuracy(int accuracy) {
+    public void setAccuracy(long accuracy) {
         this.accuracy = accuracy;
     }
 

@@ -1,9 +1,11 @@
 package com.example.hotspot.ui.settings;
 
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,13 +23,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class ViewDatabase extends AppCompatActivity {
     private static final String TAG = "ViewDatabase";
 
+    TextView textViewTitle;
+
 //    Add Firebase stuff
     private FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
-    private DatabaseReference myRef = mFirebaseDatabase.getReference();
+    private DatabaseReference myRef;
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -47,8 +52,10 @@ public class ViewDatabase extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
         userID = user.getUid();
+        myRef = mFirebaseDatabase.getReference(userID);
 
-        // this is not the thing that's crashing it
+        textViewTitle =  findViewById(R.id.textViewTitle);
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -69,8 +76,8 @@ public class ViewDatabase extends AppCompatActivity {
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and again whenever data at this location is updated.
-                // showData is breaking the app
+//                 This method is called once with the initial value and again whenever data at this location is updated.
+//                 showData is breaking the app
                 showData(dataSnapshot);
             }
 
@@ -82,25 +89,16 @@ public class ViewDatabase extends AppCompatActivity {
 
     // this method is breaking the app
     private void showData(DataSnapshot dataSnapshot) {
-        for(DataSnapshot ds : dataSnapshot.getChildren()){
+
+       for(DataSnapshot place : dataSnapshot.child("places").getChildren()){
+
+           HashMap location =(HashMap) place.getValue();
             UserInformation uInfo = new UserInformation();
-//            uInfo.setName(ds.child(userID).getValue(UserInformation.class).getName()); //set the name
-//            uInfo.setEmail(ds.child(userID).getValue(UserInformation.class).getEmail()); //set the email
-//            uInfo.setPhone_num(ds.child(userID).getValue(UserInformation.class).getPhone_num()); //set the phone_num
+            uInfo.setAccuracy((long)location.get("accuracy"));
+            uInfo.setComplete((boolean)location.get("complete"));
 
-//            this is breaking the app
-//            uInfo.setAccuracy(ds.child(userID).getValue(UserInformation.class).getAccuracy());
-//            uInfo.setComplete(ds.child(userID).getValue(UserInformation.class).isComplete());
-
-//            //display all the information
-////            Log.d(TAG, "showData: name: " + uInfo.getName());
-            Log.d(TAG, "showData: Complete: " + uInfo.getAccuracy());
-            Log.d(TAG, "showData: Complete: " + uInfo.isComplete());
-//
             ArrayList<Object> array  = new ArrayList<>();
-//            array.add(uInfo.getName());
-//            array.add(uInfo.getEmail());
-//            array.add(uInfo.getPhone_num());
+
             array.add(uInfo.getAccuracy());
             array.add(uInfo.isComplete());
 
