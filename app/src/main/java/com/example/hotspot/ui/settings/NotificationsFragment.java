@@ -10,10 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.example.hotspot.R;
 import com.example.hotspot.ui.login.LoginActivity;
@@ -24,9 +21,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class NotificationsFragment extends Fragment {
+    private static final String TAG = "MainActivity";
 
     TextView textView;
-    Button btnDeleteUser,btnLogout;
+    Button btnDeleteUser,btnLogout, btnViewDatabase;
     FirebaseAuth firebaseAuth;
     private FirebaseAuth.AuthStateListener  authStateListener;
 
@@ -47,6 +45,7 @@ public class NotificationsFragment extends Fragment {
         textView = (TextView) view.findViewById(R.id.textView1);
         btnDeleteUser =(Button) view.findViewById(R.id.kullaniciSil);
         btnLogout =(Button) view.findViewById(R.id.cikis_yap);
+        btnViewDatabase = (Button) view.findViewById(R.id.view_items_screen);
 
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -89,6 +88,14 @@ public class NotificationsFragment extends Fragment {
                 firebaseAuth.signOut();
                 startActivity(new Intent(getActivity(),LoginActivity.class));
 //                finish();
+            }
+        });
+
+        btnViewDatabase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ViewDatabase.class);
+                startActivity(intent);
             }
         });
 
