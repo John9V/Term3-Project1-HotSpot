@@ -1,14 +1,17 @@
 package com.example.hotspot.ui.home;
 
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -24,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -36,11 +40,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
-
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import static android.content.ContentValues.TAG;
 
 public class HomeFragment extends Fragment implements OnMapReadyCallback {
-
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private static final int DEFAULT_ZOOM = 10;
     private HomeViewModel homeViewModel;
@@ -50,21 +57,20 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private Location lastKnownLocation;
     private LatLng defaultLocation;
     private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+    private DatabaseReference myRef;
+    private DatabaseReference placesRef;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private String userID = user.getUid();
     private DatabaseReference mostRecentPlace = database.getReference(userID).child("mostRecentPlace");
     private DatabaseReference places = database.getReference(userID).child("places");
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//    }
+    private ArrayList<Pair<String, String>> risks = new ArrayList<Pair<String, String>>();
+//    private static GeoApiContext context = new GeoApiContext.Builder().apiKey("AIzaSyBZKhlW5rencQBYPaDXRsYqkFrKeyNxnlw").build();
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         MapView mapView = (MapView) root.findViewById(R.id.mapView);
-//        final TextView textView = root.findViewById(R.id.text_home);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
@@ -72,21 +78,102 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         getLocationPermission();
         periodicallyStoreLocation(); // causes a duplicate store of the location
 
-//        // Write a message to the database
-
-        DatabaseReference myRef = database.getReference("message");
-        myRef.setValue("Hello, World!");
-
-
-        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        myRef = mFirebaseDatabase.getReference(userID);
+        placesRef = mFirebaseDatabase.getReference("masterSheet");
+        myRef.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                final ArrayList<LatLng> userLocations = getUserLocations(dataSnapshot);
+                placesRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot outbreakSnapshot) {
+                        ArrayList<LatLng> outbreakLocs = getOutbreakLocations(outbreakSnapshot);
+                        ArrayList<Double> distances = getDistances(userLocations, outbreakLocs);
+                        if(googleMap != null) {
+
+                            for(LatLng coord : userLocations) {
+                                googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).position(coord).title("User Location"));
+                            }
+
+                            for(LatLng coord : outbreakLocs) {
+                                googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).position(coord).title("Outbreak Location"));
+                            }
+                        }
+                        System.out.println(distances.size() + " " + distances);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
+        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {}});
+        System.out.println("risks: " + risks);
         return root;
     }
 
+    private ArrayList<Double> getDistances(ArrayList<LatLng> userLocs, ArrayList<LatLng> outbreakLocs) {
+        ArrayList<Double> distances = new ArrayList<Double>();
+        System.out.println("userlocs size: " + userLocs.size());
+        System.out.println("outbreakLocs size: " + outbreakLocs.size());
+        int counter = 0;
+        for(int i = 0; i < userLocs.size(); i++) {
+            for(int j = 0; j < outbreakLocs.size(); j++) {
+                float[] results = new float[1];
+                double lat1 = userLocs.get(i).latitude;
+                double long1 = userLocs.get(i).longitude;
+                double lat2 = outbreakLocs.get(j).latitude;
+                double long2 = outbreakLocs.get(j).longitude;
+                Location.distanceBetween(lat1, long1, lat2, long2, results);
+                distances.add(Double.valueOf(results[0]));
+                if(results[0] < 6000) {
+                    Geocoder geo = new Geocoder(getActivity(), Locale.CANADA);
+                    List<Address> addressList = new ArrayList<>();
+                    List<Address> addressList2 = new ArrayList<>();
+                    try {
+                        addressList = geo.getFromLocation(lat1, long1, 1);
+                        addressList2 = geo.getFromLocation(lat2, long2, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    risks.add(new Pair<>(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)));
+                    Toast mToastToShow = Toast.makeText(getActivity(), "Exposure risk when you were at " + addressList.get(0).getAddressLine(0) + " near "
+                            + addressList2.get(0).getAddressLine(0), Toast.LENGTH_LONG);
+                    mToastToShow.show();
+                }
+            }
+        }
+        return distances;
+    }
+
+    private ArrayList<LatLng> getOutbreakLocations(DataSnapshot dataSnapshot) {
+        ArrayList<LatLng> array  = new ArrayList<>();
+
+        for(DataSnapshot place : dataSnapshot.getChildren()) {
+            double lat = (double) place.child("1").getValue();
+            double lng = (double) place.child("2").getValue();
+            LatLng newLatLng = new LatLng(lat, lng);
+            array.add(newLatLng);
+        }
+        return array;
+    }
+
+    private ArrayList<LatLng> getUserLocations(DataSnapshot dataSnapshot) {
+        ArrayList<LatLng> array  = new ArrayList<>();
+        for(DataSnapshot place : dataSnapshot.child("places").getChildren()) {
+            HashMap location =(HashMap) place.getValue();
+            double lat = (double) location.get("latitude");
+            double lng = (double) location.get("longitude");
+            LatLng newLatLng = new LatLng(lat, lng);
+            array.add(newLatLng);
+        }
+        return array;
+    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -163,9 +250,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful()) {
-                                lastKnownLocation = task.getResult();
-                                moveCameraTo(lastKnownLocation);
-                                storeRecentPlace();
+                            lastKnownLocation = task.getResult();
+                            moveCameraTo(lastKnownLocation);
+                            storeRecentPlace();
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
@@ -237,7 +324,6 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                     .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
                             googleMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
-
                     }
                 });
             }
@@ -245,11 +331,5 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
             Log.e("Exception: %s", e.getMessage(), e);
         }
     }
-
-
-
-
-
-
 
 }
