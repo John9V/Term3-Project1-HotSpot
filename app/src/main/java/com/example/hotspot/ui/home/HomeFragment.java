@@ -1,5 +1,6 @@
 package com.example.hotspot.ui.home;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
@@ -65,6 +66,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private DatabaseReference mostRecentPlace = database.getReference(userID).child("mostRecentPlace");
     private DatabaseReference places = database.getReference(userID).child("places");
     private ArrayList<Pair<String, String>> risks = new ArrayList<Pair<String, String>>();
+    Geocoder geo;
 //    private static GeoApiContext context = new GeoApiContext.Builder().apiKey("AIzaSyBZKhlW5rencQBYPaDXRsYqkFrKeyNxnlw").build();
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,6 +79,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         mapView.getMapAsync(this);
         getLocationPermission();
         periodicallyStoreLocation(); // causes a duplicate store of the location
+        final Context thiscontext = container.getContext();
+        geo = new Geocoder(thiscontext, Locale.CANADA);
 
         myRef = mFirebaseDatabase.getReference(userID);
         placesRef = mFirebaseDatabase.getReference("masterSheet");
@@ -99,7 +103,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                 googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).position(coord).title("Outbreak Location"));
                             }
                         }
-                        System.out.println(distances.size() + " " + distances);
+                        Toast mToastToShow = Toast.makeText(thiscontext, "Exposure risk when you were at " + risks.get(0).first + " near "
+                                + risks.get(0).second, Toast.LENGTH_LONG);
+                        mToastToShow.show();
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
@@ -113,6 +119,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {}});
+
         System.out.println("risks: " + risks);
         return root;
     }
@@ -132,7 +139,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                 Location.distanceBetween(lat1, long1, lat2, long2, results);
                 distances.add(Double.valueOf(results[0]));
                 if(results[0] < 6000) {
-                    Geocoder geo = new Geocoder(getActivity(), Locale.CANADA);
+//                    Geocoder geo = new Geocoder(getContext(), Locale.CANADA);
                     List<Address> addressList = new ArrayList<>();
                     List<Address> addressList2 = new ArrayList<>();
                     try {
@@ -142,9 +149,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         e.printStackTrace();
                     }
                     risks.add(new Pair<>(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)));
-                    Toast mToastToShow = Toast.makeText(getActivity(), "Exposure risk when you were at " + addressList.get(0).getAddressLine(0) + " near "
-                            + addressList2.get(0).getAddressLine(0), Toast.LENGTH_LONG);
-                    mToastToShow.show();
+                    System.out.println("risks in getDistances: " + risks);
+//                    Toast mToastToShow = Toast.makeText(getActivity(), "Exposure risk when you were at " + addressList.get(0).getAddressLine(0) + " near "
+//                            + addressList2.get(0).getAddressLine(0), Toast.LENGTH_LONG);
+//                    mToastToShow.show();
                 }
             }
         }
