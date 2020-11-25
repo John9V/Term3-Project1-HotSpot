@@ -9,6 +9,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.hotspot.R;
@@ -85,6 +86,10 @@ public class ViewDatabase extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.mipmap.ic_launcher);
     } // onCreate ending
 
     // this method is breaking the app

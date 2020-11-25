@@ -9,6 +9,7 @@ import android.widget.EditText;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -51,6 +52,10 @@ public class MainActivity extends AppCompatActivity {
 ////                startActivity(intent);
 ////            }
 ////        });
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.mipmap.ic_launcher);
     }
 
 //    @Override
