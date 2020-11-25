@@ -2,6 +2,7 @@ package com.example.hotspot.ui.login;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -96,6 +97,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         if(firebaseAuth.getCurrentUser()!=null){
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setIcon(R.mipmap.ic_launcher);
 
     }
 
