@@ -26,6 +26,6 @@
     <fragment
         android:id="@+id/navigation_user_management"
         android:name="com.example.hotspot.ui.settings.NotificationsFragment"
-        android:label="@string/title_settings"
+        android:label="@string/title_user_management"
         tools:layout="@layout/fragment_notifications" />
 </navigation>

@@ -33,6 +33,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -72,7 +73,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        MapView mapView = (MapView) root.findViewById(R.id.mapView);
+        final MapView mapView = (MapView) root.findViewById(R.id.mapView);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.getActivity());
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
@@ -103,9 +104,17 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                                 googleMap.addMarker(new MarkerOptions().icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)).position(coord).title("Outbreak Location"));
                             }
                         }
-                        Toast mToastToShow = Toast.makeText(thiscontext, "Exposure risk when you were at " + risks.get(0).first + " near "
-                                + risks.get(0).second, Toast.LENGTH_LONG);
-                        mToastToShow.show();
+
+                        // Snackbar indicating exposure risk
+                        Snackbar snackbar = Snackbar
+                                .make(mapView, "Exposure risk when you were at "
+                                        + risks.get(0).first + " near "
+                                        + risks.get(0).second, Snackbar.LENGTH_INDEFINITE)
+                                .setAction(("OK"), new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View view) { }
+                                });
+                        snackbar.show();
                     }
                     @Override
                     public void onCancelled(DatabaseError databaseError) {

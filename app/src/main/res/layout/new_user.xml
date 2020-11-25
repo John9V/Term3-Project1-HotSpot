@@ -8,31 +8,33 @@
 
 
     <EditText
+        android:id="@+id/edit_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
         android:layout_marginTop="10dp"
         android:hint="E-mail"
-        android:id="@+id/edit_email" />
+        android:inputType="textEmailAddress"
+        android:textColorHint="@color/colorSecondaryDark" />
 
     <EditText
+        android:id="@+id/edit_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
         android:layout_marginTop="10dp"
-        android:id="@+id/edit_password"
-        android:hint="Password" />
+        android:ems="10"
+        android:hint="Password"
+        android:inputType="textPassword"
+        android:textColorHint="@color/colorSecondaryDark" />
 
 
     <Button
-        android:text="Sign Up"
+        android:id="@+id/btn_register"
         android:layout_width="100dp"
         android:layout_height="50dp"
         android:layout_marginTop="50dp"
-        android:textColor="#FFFF"
-        android:id="@+id/btn_register"
-        android:background="@color/colorAccent"/>
+        android:background="@color/colorPrimary"
+        android:text="Sign Up"
+        android:textColor="#FFFF" />
 
 
     <Button

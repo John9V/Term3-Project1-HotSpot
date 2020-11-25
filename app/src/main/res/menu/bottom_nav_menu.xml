@@ -18,7 +18,7 @@
 
     <item
         android:id="@+id/navigation_user_management"
-        android:icon="@drawable/ic_baseline_settings_24"
+        android:icon="@drawable/ic_account"
         android:title="@string/title_user_management" />
 
 </menu>
