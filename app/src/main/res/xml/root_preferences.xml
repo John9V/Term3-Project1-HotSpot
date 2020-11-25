@@ -2,43 +2,51 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="@string/messages_header">
+    <PreferenceCategory
+        app:icon="@android:drawable/ic_popup_sync"
+        app:title="@string/messages_header">
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="perform_sync"
+            android:summary="Enable or disable data synchronization"
             android:title="Enable Auto-sync"
-            android:summary="Enable or disable data synchronization" />
+            app:iconSpaceReserved="false" />
 
         <ListPreference
             android:defaultValue="30"
+            android:dependency="perform_sync"
             android:entries="@array/updateInterval"
             android:entryValues="@array/updateIntervalValues"
             android:key="sync_interval"
-            android:title="Sync Interval"
             android:summary="Define how often synchronization occurs"
-            android:dependency="perform_sync" />
+            android:title="Sync Interval"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
+    <PreferenceCategory
+        app:icon="@android:drawable/ic_dialog_info"
+        app:title="@string/sync_header">
         <EditTextPreference
             android:defaultValue=""
+            android:dialogMessage="Enter full name"
+            android:dialogTitle="Enter your full name"
+            android:inputType="textCapWords"
             android:key="full_name"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Your full name"
             android:summary="Enter your full name to be used in the application"
-            android:dialogTitle="Enter your full name"
-            android:dialogMessage="Enter full name"
-            android:inputType="textCapWords" />
+            android:title="Your full name"
+            app:iconSpaceReserved="false" />
         <EditTextPreference
             android:defaultValue=""
+            android:dialogMessage="Enter your email address"
+            android:inputType="textEmailAddress"
             android:key="email_address"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="Email Address"
             android:summary="Enter your email address"
-            android:dialogMessage="Enter your email address"
-            android:inputType="textEmailAddress" />
+            android:title="Email Address"
+            app:iconSpaceReserved="false" />
     </PreferenceCategory>
 
 </PreferenceScreen>
