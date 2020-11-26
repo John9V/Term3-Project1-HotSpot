@@ -44,7 +44,7 @@ public class ViewDatabase extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.view_database);
+        setContentView(R.layout.fragment_risks);
 
         mListView = (ListView) findViewById(R.id.listview);
 

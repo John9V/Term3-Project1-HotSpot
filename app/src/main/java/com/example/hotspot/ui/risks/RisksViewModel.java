@@ -1,16 +1,16 @@
-package com.example.hotspot.ui.statistics;
+package com.example.hotspot.ui.risks;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class StatisticsViewModel extends ViewModel {
+public class RisksViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public StatisticsViewModel() {
+    public RisksViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is the statistics fragment");
+        mText.setValue("This is the risks fragment");
     }
 
     public LiveData<String> getText() {

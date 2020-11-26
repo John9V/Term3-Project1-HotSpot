@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/navigation_statistics"
-        android:name="com.example.hotspot.ui.statistics.StatisticsFragment"
-        android:label="@string/title_statistics"
-        tools:layout="@layout/fragment_statistics" />
+        android:id="@+id/navigation_risks"
+        android:name="com.example.hotspot.ui.risks.RisksFragment"
+        android:label="@string/title_risks"
+        tools:layout="@layout/fragment_risks" />
 
     <fragment
         android:id="@+id/navigation_notifications"

@@ -8,11 +8,10 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
-import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -20,8 +19,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.example.hotspot.R;
+import com.example.hotspot.data.Risk;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,7 +42,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,7 +67,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
     private String userID = user.getUid();
     private DatabaseReference mostRecentPlace = database.getReference(userID).child("mostRecentPlace");
     private DatabaseReference places = database.getReference(userID).child("places");
-    private ArrayList<Pair<String, String>> risks = new ArrayList<Pair<String, String>>();
+    public static ArrayList<Risk> risks = new ArrayList<>();
     Geocoder geo;
 //    private static GeoApiContext context = new GeoApiContext.Builder().apiKey("AIzaSyBZKhlW5rencQBYPaDXRsYqkFrKeyNxnlw").build();
 
@@ -108,8 +109,8 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         // Snackbar indicating exposure risk
                         Snackbar snackbar = Snackbar
                                 .make(mapView, "Exposure risk when you were at "
-                                        + risks.get(0).first + " near "
-                                        + risks.get(0).second, Snackbar.LENGTH_INDEFINITE)
+                                        + risks.get(0).getUserAdd() + " near "
+                                        + risks.get(0).getOutbreakAdd(), Snackbar.LENGTH_INDEFINITE)
                                 .setAction(("OK"), new View.OnClickListener() {
                                     @Override
                                     public void onClick(View view) { }
@@ -157,7 +158,7 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    risks.add(new Pair<>(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)));
+                    risks.add(new Risk(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)));
                     System.out.println("risks in getDistances: " + risks);
 //                    Toast mToastToShow = Toast.makeText(getActivity(), "Exposure risk when you were at " + addressList.get(0).getAddressLine(0) + " near "
 //                            + addressList2.get(0).getAddressLine(0), Toast.LENGTH_LONG);
