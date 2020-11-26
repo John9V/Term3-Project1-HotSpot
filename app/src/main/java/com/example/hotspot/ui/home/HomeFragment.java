@@ -158,11 +158,10 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    risks.add(new Risk(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)));
-                    System.out.println("risks in getDistances: " + risks);
-//                    Toast mToastToShow = Toast.makeText(getActivity(), "Exposure risk when you were at " + addressList.get(0).getAddressLine(0) + " near "
-//                            + addressList2.get(0).getAddressLine(0), Toast.LENGTH_LONG);
-//                    mToastToShow.show();
+                    if (!risks.contains(new Risk(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)))) {
+                        risks.add(new Risk(addressList.get(0).getAddressLine(0), addressList2.get(0).getAddressLine(0)));
+                        System.out.println("risks in getDistances: " + risks);
+                    }
                 }
             }
         }

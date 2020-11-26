@@ -25,4 +25,15 @@ public class Risk {
         this.outbreakAdd = outbreakAdd;
     }
 
+    @Override
+    public boolean equals(Object object) {
+        boolean isEqual= false;
+
+        if (object != null && object instanceof Risk) {
+            isEqual = (this.userAdd.equals(((Risk) object).userAdd) && this.outbreakAdd.equals(((Risk) object).outbreakAdd));
+        }
+
+        return isEqual;
+    }
+
 }
