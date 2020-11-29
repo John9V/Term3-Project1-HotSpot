@@ -1,4 +1,7 @@
 package com.example.hotspot.ui.risks;
+/**
+ * Is this used? What is this? Wilson did you write this or was it John?
+ */
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

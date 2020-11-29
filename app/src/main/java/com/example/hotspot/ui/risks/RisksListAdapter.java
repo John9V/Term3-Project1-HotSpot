@@ -1,4 +1,7 @@
 package com.example.hotspot.ui.risks;
+/**
+ * List adapter for risk object, used by listview on risk fragment page.
+ */
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +14,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.hotspot.R;
 import com.example.hotspot.data.Risk;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 public class RisksListAdapter extends RecyclerView.Adapter<RisksListAdapter.ViewHolder> {
+    /**
+     * List of risks to convert to a UI element.
+     */
     private ArrayList<Risk> risks;
 
     public RisksListAdapter(ArrayList<Risk> risks) {
@@ -25,7 +29,8 @@ public class RisksListAdapter extends RecyclerView.Adapter<RisksListAdapter.View
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.risks_list_layout, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.risks_list_layout,
+                parent, false);
         return new ViewHolder(view);
     }
 
@@ -39,7 +44,6 @@ public class RisksListAdapter extends RecyclerView.Adapter<RisksListAdapter.View
 
         userAdd.setText(risk.getUserAdd());
         outbreakAdd.setText(risk.getOutbreakAdd());
-
     }
 
     @Override

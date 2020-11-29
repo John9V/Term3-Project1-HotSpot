@@ -1,5 +1,9 @@
 package com.example.hotspot.ui.home;
 
+/**
+ * Who wrote this?
+ */
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
