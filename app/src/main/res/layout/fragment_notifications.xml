@@ -59,9 +59,7 @@
             android:text="View Database Contents"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="0dp" />
+            tools:layout_editor_absoluteX="0dp"
+            android:visibility="invisible"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 </ScrollView>
