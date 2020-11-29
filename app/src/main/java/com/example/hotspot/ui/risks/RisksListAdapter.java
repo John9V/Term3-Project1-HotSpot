@@ -42,8 +42,8 @@ public class RisksListAdapter extends RecyclerView.Adapter<RisksListAdapter.View
         TextView userAdd = view.findViewById(R.id.tv_user_add);
         TextView outbreakAdd = view.findViewById(R.id.tv_outbreak_add);
 
-        userAdd.setText(risk.getUserAdd());
-        outbreakAdd.setText(risk.getOutbreakAdd());
+        userAdd.setText("\n" + "User location: " + risk.getUserAdd());
+        outbreakAdd.setText("Outbreak location: " + risk.getOutbreakAdd());
     }
 
     @Override
