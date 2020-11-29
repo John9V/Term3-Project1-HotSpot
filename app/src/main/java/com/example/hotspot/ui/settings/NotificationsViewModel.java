@@ -1,5 +1,9 @@
 package com.example.hotspot.ui.settings;
 
+/**
+ * What is this? Who wrote it?
+ */
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;

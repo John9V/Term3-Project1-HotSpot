@@ -1,12 +1,14 @@
 package com.example.hotspot.ui.settings;
 
-import java.math.BigDecimal;
+/**
+ * Wilson why are we remembering these two pieces of informpation in particular?-
+ */
 
 public class UserInformation {
     private long accuracy;
     private boolean complete;
 
-    public UserInformation(){
+    public UserInformation() {
     }
 
     public long getAccuracy() {

@@ -1,5 +1,12 @@
 package com.example.hotspot.data;
 
+/**
+ * Don't remember if this is important or not. Must have copied it from somewhere.
+ *
+ * Might have been https://medium.com/etiya/firebase-authentication-sample-371b5940ba93
+ * This was the guide I used to write the login page.
+ */
+
 import com.example.hotspot.data.model.LoggedInUser;
 
 /**
