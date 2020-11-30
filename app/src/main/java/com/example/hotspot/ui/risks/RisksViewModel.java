@@ -1,6 +1,6 @@
 package com.example.hotspot.ui.risks;
 /**
- * Is this used? What is this? Wilson did you write this or was it John?
+ * Risks view model to help connect our list of risks
  */
 
 import androidx.lifecycle.LiveData;

@@ -1,7 +1,7 @@
 package com.example.hotspot.ui.settings;
 
 /**
- * View for user actions. Unsure why we called it "Notifications?"
+ * View for user actions. Has not been refactored from when it was called 'Notifications'.
  */
 
 import android.content.Intent;

@@ -1,7 +1,7 @@
 package com.example.hotspot.ui.home;
 
 /**
- * Who wrote this?
+ * Default view model for home fragment
  */
 
 import androidx.lifecycle.LiveData;

@@ -1,7 +1,7 @@
 package com.example.hotspot.ui.settings;
 
 /**
- * What is this? Who wrote it?
+ * Archived class
  */
 
 import androidx.lifecycle.LiveData;

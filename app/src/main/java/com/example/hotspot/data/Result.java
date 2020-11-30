@@ -1,10 +1,6 @@
 package com.example.hotspot.data;
 
 /**
- * Who the heck wrote this? What does it do?
- */
-
-/**
  * A generic class that holds a result success w/ data or an error exception.
  */
 public class Result<T> {

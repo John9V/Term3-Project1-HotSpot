@@ -1,7 +1,7 @@
 package com.example.hotspot.ui.settings;
 
 /**
- * Wilson what does this do?
+ * Base settings fragment, helps connect settings
  */
 
 import android.os.Bundle;
@@ -13,6 +13,5 @@ public class SettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey);
-
     }
 }

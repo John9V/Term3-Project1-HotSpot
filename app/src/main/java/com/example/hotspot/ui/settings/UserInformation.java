@@ -1,7 +1,7 @@
 package com.example.hotspot.ui.settings;
 
 /**
- * Wilson why are we remembering these two pieces of informpation in particular?-
+ * Class for testing purposes only, to extract information from Firebase to the app
  */
 
 public class UserInformation {
